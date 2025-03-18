@@ -1,9 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function Card() {
   const [pkmnUrlArray, setPkmnUrlArray] = useState([]);
   const [pkmnSpriteArray, setPkmnSpriteArray] = useState([]);
   const [pkmnNameArray, setPkmnNameArray] = useState([]);
+  const [cardImageArray, setcardImageArray] = useState([]);
+
+  const [currentScore, setcurrentScore] = useState(0);
+  const [clickedPokemons, setclickedPokemons] = useState([]);
 
   async function fetchKantoPokemon() {
     const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
@@ -29,7 +33,6 @@ export default function Card() {
   }
 
   async function fetchPokemonNames(urlArray) {
-    console.log(urlArray);
     const names = await Promise.all(
       urlArray.map(async (url) => {
         const response = await fetch(url);
@@ -48,35 +51,51 @@ export default function Card() {
   }, [pkmnUrlArray]);
 
   const generateRandomCard = () => {
-    const randomNumber = Math.round(Math.random() * 100);
+    if (pkmnNameArray.length === 0 || pkmnSpriteArray === 0) return null;
+    const randomNumber = Math.floor(Math.random() * 151);
     const pokemonName = pkmnNameArray[randomNumber];
     const pokemonUrl = pkmnSpriteArray[randomNumber];
     return { pokemonName, pokemonUrl };
   };
 
-  const cardObjectArray = [];
-  for (let i = 0; i < 8; i++) {
-    cardObjectArray.push(generateRandomCard());
-  }
+  const generateRandomCards = useCallback(() => {
+    if (pkmnNameArray.length === 0 || pkmnSpriteArray.length === 0) return;
+    const cardObjectArray = [];
+    for (let i = 0; i < 8; i++) {
+      cardObjectArray.push(generateRandomCard());
+    }
+
+    setcardImageArray(cardObjectArray);
+  }, [pkmnNameArray, pkmnSpriteArray]);
+
+  const countScore = (pokemon) => {
+    // index is the pokedex number of the pokemon
+    console.log(`you clicked on the pokemon ${pokemon}`);
+    setclickedPokemons(pokemon);
+  };
+  console.log(clickedPokemons);
+
+  useEffect(() => {
+    if (pkmnNameArray.length > 0 && pkmnSpriteArray.length > 0) {
+      generateRandomCards();
+    }
+  }, [generateRandomCards, pkmnNameArray, pkmnSpriteArray]);
 
   return (
     <div className="cards">
-      <div className="card" id="card-1">
-        <h3>{cardObjectArray[0].pokemonName}</h3>
-        <img src={cardObjectArray[0].pokemonUrl} alt="" />
-      </div>
-      <div className="card" id="card-2">
-        <h3>{cardObjectArray[1].pokemonName}</h3>
-        <img src={cardObjectArray[1].pokemonUrl} alt="" />
-      </div>
-      <div className="card" id="card-3">
-        <h3>{cardObjectArray[2].pokemonName}</h3>
-        <img src={cardObjectArray[2].pokemonUrl} alt="" />
-      </div>
-      <div className="card" id="card-4">
-        <h3>{cardObjectArray[3].pokemonName}</h3>
-        <img src={cardObjectArray[3].pokemonUrl} alt="" />
-      </div>
+      {cardImageArray.map((card, index) => (
+        <div className="card" id={index} key={index}>
+          <h3>{card.pokemonName}</h3>
+          <img
+            src={card.pokemonUrl}
+            onClick={() => {
+              generateRandomCards();
+              countScore(card.pokemonName);
+            }}
+            alt=""
+          />
+        </div>
+      ))}
     </div>
   );
 }

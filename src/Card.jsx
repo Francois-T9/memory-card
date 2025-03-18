@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 
-export default function Card() {
+export default function Card({ setcurrentScore }) {
   const [pkmnUrlArray, setPkmnUrlArray] = useState([]);
   const [pkmnSpriteArray, setPkmnSpriteArray] = useState([]);
   const [pkmnNameArray, setPkmnNameArray] = useState([]);
   const [cardImageArray, setcardImageArray] = useState([]);
 
-  const [currentScore, setcurrentScore] = useState(0);
+  // const [currentScore, setcurrentScore] = useState(0);
   const [clickedPokemons, setclickedPokemons] = useState([]);
 
   async function fetchKantoPokemon() {
@@ -69,11 +69,19 @@ export default function Card() {
   }, [pkmnNameArray, pkmnSpriteArray]);
 
   const countScore = (pokemon) => {
-    // index is the pokedex number of the pokemon
     console.log(`you clicked on the pokemon ${pokemon}`);
-    setclickedPokemons(pokemon);
+
+    if (clickedPokemons.includes(pokemon)) {
+      console.log("you lost");
+
+      setcurrentScore(0);
+      setclickedPokemons([]);
+    } else {
+      setcurrentScore((prevScore) => prevScore + 1);
+    }
+
+    setclickedPokemons((prevClicked) => [...prevClicked, pokemon]);
   };
-  console.log(clickedPokemons);
 
   useEffect(() => {
     if (pkmnNameArray.length > 0 && pkmnSpriteArray.length > 0) {

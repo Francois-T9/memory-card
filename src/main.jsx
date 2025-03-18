@@ -7,7 +7,6 @@ import Board from "./Board.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Header />
-    <Board />
+    <App />
   </StrictMode>
 );

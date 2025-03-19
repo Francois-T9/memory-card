@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-export default function Card({ setcurrentScore }) {
+export default function Card({ setcurrentScore, limit, offset }) {
   const [pkmnUrlArray, setPkmnUrlArray] = useState([]);
   const [pkmnSpriteArray, setPkmnSpriteArray] = useState([]);
   const [pkmnNameArray, setPkmnNameArray] = useState([]);
@@ -10,7 +10,9 @@ export default function Card({ setcurrentScore }) {
   const [clickedPokemons, setclickedPokemons] = useState([]);
 
   async function fetchKantoPokemon() {
-    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
+    const response = await fetch(
+      `https://pokeapi.co/api/v2/pokemon?limit=151&offset=0`
+    );
     const allPokemon = await response.json();
 
     const urls = allPokemon.results.map((elem) => elem.url);
